@@ -2946,11 +2946,14 @@ static noinline int shared_bus_set_rate(struct clk *bus, unsigned long rate,
 
 	mv = tegra_dvfs_predict_millivolts(bus, rate);
 	old_mv = tegra_dvfs_predict_millivolts(bus, old_rate);
-	if (IS_ERR_VALUE(mv) || IS_ERR_VALUE(old_mv)) {
-		pr_err("%s: Failed to predict %s voltage for %lu => %lu\n",
-		       __func__, bus->name, old_rate, rate);
-		return -EINVAL;
-	}
+	//if (IS_ERR_VALUE(mv) || IS_ERR_VALUE(old_mv)) {
+	//	pr_err("%s: Failed to predict %s voltage for %lu => %lu\n",
+	//	       __func__, bus->name, old_rate, rate);
+	//	return -EINVAL;
+	//}
+	
+	//pr_info("SHARED_BUS_SET_RATE: %dmV\n", mv);
+	//pr_info("SHARED_BUS_SET_RATE: %dold_mV\n", old_mv);
 
 	/* emc bus: set bridge rate as intermediate step when crossing
 	 * bridge threshold in any direction
@@ -3196,11 +3199,17 @@ static struct clk tegra_pll_ref = {
 };
 
 static struct clk_pll_freq_table tegra_pll_c_freq_table[] = {
-	{ 12000000, 1200000000, 600,  6, 1, 8},
-	{ 13000000, 1200000000, 923, 10, 1, 8},		/* actual: 1199.9 MHz */
-	{ 16800000, 1200000000, 500,  7, 1, 8},
-	{ 19200000, 1200000000, 500,  8, 1, 8},
-	{ 26000000, 1200000000, 600, 13, 1, 8},
+	{ 12000000, 1500000000, 750,  6, 1, 8},
+	{ 13000000, 1500000000, 750, 13, 2, 8},
+	{ 16800000, 1500000000, 625,  7, 1, 8},
+	{ 19200000, 1500000000, 625,  8, 1, 8},
+	{ 26000000, 1500000000, 750, 13, 1, 8},
+	
+	{ 12000000, 1332000000, 666,  6, 1, 8},
+	{ 13000000, 1332000000, 666, 13, 2, 8},		/* actual: 1199.9 MHz */
+	{ 16800000, 1332000000, 555,  7, 1, 8},
+	{ 19200000, 1332000000, 555,  8, 1, 8},
+	{ 26000000, 1332000000, 666, 13, 1, 8},
 
 	{ 12000000, 1040000000, 520,  6, 1, 8},
 	{ 13000000, 1040000000, 480,  6, 1, 8},
@@ -3246,7 +3255,7 @@ static struct clk tegra_pll_c = {
 	.ops       = &tegra_pll_ops,
 	.reg       = 0x80,
 	.parent    = &tegra_pll_ref,
-	.max_rate  = 1400000000,
+	.max_rate  = 1600000000,
 	.u.pll = {
 		.input_min = 2000000,
 		.input_max = 31000000,
@@ -3266,7 +3275,7 @@ static struct clk tegra_pll_c_out1 = {
 	.parent    = &tegra_pll_c,
 	.reg       = 0x84,
 	.reg_shift = 0,
-	.max_rate  = 700000000,
+	.max_rate  = 800000000,
 };
 
 static struct clk_pll_freq_table tegra_pll_m_freq_table[] = {
@@ -3900,6 +3909,7 @@ static struct clk tegra_clk_virtual_cpu_g = {
 	.parent    = &tegra_clk_cclk_g,
 	.ops       = &tegra_cpu_ops,
 	.max_rate  = 1700000000,
+	.min_rate  = 100000000,
 	.u.cpu = {
 		.main      = &tegra_pll_x,
 		.backup    = &tegra_pll_p,
@@ -3911,7 +3921,7 @@ static struct clk tegra_clk_virtual_cpu_lp = {
 	.name      = "cpu_lp",
 	.parent    = &tegra_clk_cclk_lp,
 	.ops       = &tegra_cpu_ops,
-	.max_rate  = 620000000,
+	.max_rate  = 600000000,
 	.u.cpu = {
 		.main      = &tegra_pll_x,
 		.backup    = &tegra_pll_p,
@@ -4543,102 +4553,98 @@ void tegra_edp_throttle_cpu_now(u8 factor)
  * tables are provided, since there is no clock scaling on FPGA at all).
  */
 
+#if 0
 static struct cpufreq_frequency_table freq_table_300MHz[] = {
-	{ 0, 204000 },
+	{ 0, 200000 },
 	{ 1, 300000 },
 	{ 2, CPUFREQ_TABLE_END },
 };
 
 static struct cpufreq_frequency_table freq_table_1p0GHz[] = {
-	{ 0,  51000 },
-	{ 1, 102000 },
-	{ 2, 204000 },
-	{ 3, 312000 },
-	{ 4, 456000 },
-	{ 5, 608000 },
-	{ 6, 760000 },
-	{ 7, 816000 },
-	{ 8, 912000 },
-	{ 9, 1000000 },
-	{10, CPUFREQ_TABLE_END },
+	{ 0, 100000 },
+	{ 1, 400000 },
+	{ 2, 700000 },
+	{ 3, 1000000 },
+	{ 4, CPUFREQ_TABLE_END },
 };
+#endif //if 0
 
 static struct cpufreq_frequency_table freq_table_1p3GHz[] = {
-	{ 0,   51000 },
-	{ 1,  102000 },
-	{ 2,  204000 },
-	{ 3,  340000 },
-	{ 4,  475000 },
-	{ 5,  640000 },
-	{ 6,  760000 },
-	{ 7,  860000 },
-	{ 8, 1000000 },
-	{ 9, 1100000 },
-	{10, 1200000 },
-	{11, 1300000 },
-	{12, CPUFREQ_TABLE_END },
+	{ 0, 102000 },
+	{ 1, 475000 },
+	{ 2, 760000 },
+	{ 3, 1000000 },
+	{ 4, 1300000 },
+	{ 5, CPUFREQ_TABLE_END },
 };
 
+#if 0
 static struct cpufreq_frequency_table freq_table_1p4GHz[] = {
-	{ 0,   51000 },
-	{ 1,  102000 },
-	{ 2,  204000 },
-	{ 3,  370000 },
-	{ 4,  475000 },
-	{ 5,  620000 },
-	{ 6,  760000 },
-	{ 7,  860000 },
-	{ 8, 1000000 },
-	{ 9, 1100000 },
-	{10, 1200000 },
-	{11, 1300000 },
-	{12, 1400000 },
-	{13, CPUFREQ_TABLE_END },
+	{ 0, 100000 },
+	{ 1, 200000 },
+	{ 2, 300000 },
+	{ 3, 400000 },
+	{ 4, 500000 },
+	{ 5, 600000 },
+	{ 6, 700000 },
+	{ 7, 800000 },
+	{ 8, 900000 },
+	{ 9, 1000000 },
+	{10, 1100000 },
+	{11, 1200000 },
+	{12, 1300000 },
+	{13, 1400000 },
+	{14, CPUFREQ_TABLE_END },
 };
 
 static struct cpufreq_frequency_table freq_table_1p5GHz[] = {
-	{ 0,   51000 },
-	{ 1,  102000 },
-	{ 2,  204000 },
-	{ 3,  340000 },
-	{ 4,  475000 },
-	{ 5,  640000 },
-	{ 6,  760000 },
-	{ 7,  860000 },
-	{ 8, 1000000 },
-	{ 9, 1100000 },
-	{10, 1200000 },
-	{11, 1300000 },
-	{12, 1400000 },
-	{13, 1500000 },
-	{14, CPUFREQ_TABLE_END },
+	{ 0, 100000 },
+	{ 1, 200000 },
+	{ 2, 300000 },
+	{ 3, 400000 },
+	{ 4, 500000 },
+	{ 5, 600000 },
+	{ 6, 700000 },
+	{ 7, 800000 },
+	{ 8, 900000 },
+	{ 9, 1000000 },
+	{10, 1100000 },
+	{11, 1200000 },
+	{12, 1300000 },
+	{13, 1400000 },
+	{14, 1500000 },
+	{15, CPUFREQ_TABLE_END },
 };
 
 static struct cpufreq_frequency_table freq_table_1p7GHz[] = {
-	{ 0,   51000 },
-	{ 1,  102000 },
-	{ 2,  204000 },
-	{ 3,  370000 },
-	{ 4,  475000 },
-	{ 5,  620000 },
-	{ 6,  760000 },
-	{ 7,  910000 },
-	{ 8, 1150000 },
-	{ 9, 1300000 },
-	{10, 1400000 },
-	{11, 1500000 },
-	{12, 1600000 },
-	{13, 1700000 },
-	{14, CPUFREQ_TABLE_END },
+	{ 0, 100000 },
+	{ 1, 200000 },
+	{ 2, 300000 },
+	{ 3, 400000 },
+	{ 4, 500000 },
+	{ 5, 600000 },
+	{ 6, 700000 },
+	{ 7, 800000 },
+	{ 8, 900000 },
+	{ 9, 1000000 },
+	{10, 1100000 },
+	{11, 1200000 },
+	{12, 1300000 },
+	{13, 1400000 },
+	{14, 1500000 },
+	{15, 1600000 },
+	{16, 1700000 },
+	{17, CPUFREQ_TABLE_END },
 };
+#endif //if 0
 
 static struct tegra_cpufreq_table_data cpufreq_tables[] = {
-	{ freq_table_300MHz, 0,  1 },
-	{ freq_table_1p0GHz, 2,  8 },
-	{ freq_table_1p3GHz, 2, 10 },
-	{ freq_table_1p4GHz, 2, 11 },
-	{ freq_table_1p5GHz, 2, 12 },
-	{ freq_table_1p7GHz, 2, 12 },
+	//{ freq_table_300MHz, 0,  1 },
+	//{ freq_table_1p0GHz, 2, 11 },
+	{ freq_table_1p3GHz, 2, 6 },
+	//{ freq_table_1p4GHz, 2, 15 },
+	//{ freq_table_1p5GHz, 2, 16 },
+	//{ freq_table_1p7GHz, 2, 18 },
 };
 
 static int clip_cpu_rate_limits(
@@ -4674,8 +4680,8 @@ static int clip_cpu_rate_limits(
 		       cpu_clk_lp->max_rate, ret ? "outside" : "at the bottom");
 		return ret;
 	}
-	cpu_clk_lp->max_rate = freq_table[idx].frequency * 1000;
-	cpu_clk_g->min_rate = freq_table[idx-1].frequency * 1000;
+	//cpu_clk_lp->max_rate = freq_table[idx].frequency * 1000;
+	cpu_clk_g->min_rate = 100000;
 	data->suspend_index = idx;
 	return 0;
 }
