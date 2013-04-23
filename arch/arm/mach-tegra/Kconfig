@@ -504,4 +504,11 @@ config TEGRA_PREINIT_CLOCKS
 	help
 	  Preinitialize Tegra clocks to known states before actual full-
 	  scale clock initialization starts.
+
+config TEGRA3_RQ_STATS
+	bool "Enable rq_stats for Tegra 3 SoC"
+	depends on ARCH_TEGRA_3x_SOC
+	default n
+	help
+	  Enable rq_stats for Tegra 3 SoC.
 endif
