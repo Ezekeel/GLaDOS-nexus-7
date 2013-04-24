@@ -583,4 +583,11 @@ config FSYNC_CONTROL
         help
           Say Y here to enable FSync Control
 
+config GENERIC_HOTPLUG
+	bool "Enable generic hotplug driver"
+	depends on TEGRA3_RQ_STATS
+	default n
+	help
+	  Enable generic hotplug driver
+
 endif # MISC_DEVICES
