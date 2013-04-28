@@ -44,7 +44,7 @@ static ssize_t generic_hotplug_threshold_single_core_read(struct device * dev, s
 static ssize_t generic_hotplug_threshold_single_core_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size) {
     int data;
 
-    if (sscanf(buf, "%d\n", &data) == 1 || data < 0 || data > 100) {
+    if (sscanf(buf, "%d\n", &data) == 1 && data >= 0 && data <= 100) {
 	if (data != threshold_single_core)
 	    threshold_single_core = min(data, threshold_multi_core);
     } else {
@@ -61,7 +61,7 @@ static ssize_t generic_hotplug_threshold_multi_core_read(struct device * dev, st
 static ssize_t generic_hotplug_threshold_multi_core_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size) {
     int data;
 
-    if (sscanf(buf, "%d\n", &data) == 1 || data < 0 || data > 100) {
+    if (sscanf(buf, "%d\n", &data) == 1 && data >= 0 && data <= 100) {
 	if (data != threshold_multi_core)
 	    threshold_multi_core = max(data, threshold_single_core);
     } else {
@@ -78,7 +78,7 @@ static ssize_t generic_hotplug_poll_interval_single_core_read(struct device * de
 static ssize_t generic_hotplug_poll_interval_single_core_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size) {
     int data;
 
-    if (sscanf(buf, "%d\n", &data) == 1 || data < 0) {
+    if (sscanf(buf, "%d\n", &data) == 1 && data >= 0) {
 	if (data != poll_interval_single_core)
 	    poll_interval_single_core = data;
     } else {
@@ -95,7 +95,7 @@ static ssize_t generic_hotplug_poll_interval_multi_core_read(struct device * dev
 static ssize_t generic_hotplug_poll_interval_multi_core_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size) {
     int data;
 
-    if (sscanf(buf, "%d\n", &data) == 1 || data < 0) {
+    if (sscanf(buf, "%d\n", &data) == 1 && data >= 0) {
 	if (data != poll_interval_multi_core)
 	    poll_interval_multi_core = data;
     } else {
@@ -112,7 +112,7 @@ static ssize_t generic_hotplug_allowed_misses_read(struct device * dev, struct d
 static ssize_t generic_hotplug_allowed_misses_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size) {
     int data;
 
-    if (sscanf(buf, "%d\n", &data) == 1 || data < 0) {
+    if (sscanf(buf, "%d\n", &data) == 1 && data >= 0) {
 	if (data != allowed_misses)
 	    allowed_misses = data;
     } else {
